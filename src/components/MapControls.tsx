@@ -79,7 +79,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
           type="button"
           onClick={onRecenter}
           aria-label="Recenter map"
-          className="absolute right-4 bottom-48 z-30 w-11 h-11 rounded-full bg-white text-[#0F1B2D] border border-[#E3ECF5] shadow-soft flex items-center justify-center hover:bg-[#F5FAFF] hover:border-[#4DA8FF] active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-[#2B8CEB]"
+          className="absolute right-4 bottom-[232px] z-30 w-11 h-11 rounded-full bg-white text-[#0F1B2D] border border-[#E3ECF5] shadow-soft flex items-center justify-center hover:bg-[#F5FAFF] hover:border-[#4DA8FF] active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-[#2B8CEB]"
           title="Recenter to my location"
         >
           <Crosshair className="w-5 h-5 text-[#2B8CEB]" strokeWidth={2} />

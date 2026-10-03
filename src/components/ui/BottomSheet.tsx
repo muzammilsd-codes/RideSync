@@ -6,6 +6,7 @@ export interface BottomSheetProps {
   snapPoint?: SnapPoint;
   initialSnap?: SnapPoint;
   defaultHeight?: SnapPoint;
+  bottomOffset?: string;
   onSnapChange?: (snap: SnapPoint) => void;
   children: React.ReactNode;
   footer?: React.ReactNode;
@@ -18,6 +19,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   snapPoint: controlledSnap,
   initialSnap = 'half',
   defaultHeight,
+  bottomOffset = 'bottom-16',
   onSnapChange,
   children,
   footer,
@@ -65,16 +67,16 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     else setSnap('peek');
   };
 
-  // Height mappings for the 3 snap points
+  // Height mappings for the 3 snap points (adjusted so full snap clears top navbar)
   const snapHeights: Record<SnapPoint, string> = {
-    peek: 'h-[160px]',
-    half: 'h-[52vh] max-h-[520px]',
-    full: 'h-[86vh]',
+    peek: 'h-[140px]',
+    half: 'h-[50vh] max-h-[500px]',
+    full: 'h-[calc(100vh-140px)]',
   };
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-30 transition-all duration-200 ease-out flex justify-center pointer-events-none ${className}`}
+      className={`fixed ${bottomOffset} left-0 right-0 z-30 transition-all duration-200 ease-out flex justify-center pointer-events-none ${className}`}
     >
       <div
         className={`w-full max-w-lg bg-white rounded-t-[24px] border-t border-[#E3ECF5] shadow-soft flex flex-col pointer-events-auto overflow-hidden ${snapHeights[snap]}`}
@@ -97,11 +99,13 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto px-5 overscroll-contain no-scrollbar">
           {children}
+          {/* Breathing room so bottom-most inputs/cards scroll completely clear of the sticky footer */}
+          {activeFooter && <div className="h-20 shrink-0" />}
         </div>
 
-        {/* Sticky Pinned 56px Footer CTA */}
+        {/* Sticky Pinned 56px Footer CTA (Positioned cleanly above BottomNav) */}
         {activeFooter && (
-          <div className="sticky bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-[#E3ECF5] shrink-0">
+          <div className="sticky bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-[#E3ECF5] shrink-0 z-10">
             {activeFooter}
           </div>
         )}

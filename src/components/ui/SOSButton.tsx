@@ -67,7 +67,7 @@ export const SOSButton: React.FC<SOSButtonProps> = ({
         type="button"
         onClick={handleOpen}
         aria-label="Emergency SOS"
-        className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-full bg-[#E5484D] text-white flex items-center justify-center shadow-lg hover:bg-[#d4373c] active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-[#E5484D]/40"
+        className="fixed bottom-[164px] right-4 z-40 w-14 h-14 rounded-full bg-[#E5484D] text-white flex items-center justify-center shadow-lg hover:bg-[#d4373c] active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-[#E5484D]/40"
       >
         <span className="sr-only">Emergency SOS</span>
         <AlertTriangle className="w-6 h-6 stroke-[2.2]" />

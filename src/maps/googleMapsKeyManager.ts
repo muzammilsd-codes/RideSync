@@ -8,7 +8,7 @@ export function getGoogleMapsApiKey(): string {
   }
 
   // 2. Check Vite environment variable
-  const envKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
+  const envKey = import.meta.env.VITE_GOOGLE_MAPS_KEY || (import.meta.env as Record<string, string | undefined>).VITE_GOOGLE_MAPS_API_KEY;
   if (envKey && typeof envKey === 'string' && envKey.trim().length > 0) {
     return envKey.trim();
   }

@@ -8,7 +8,10 @@ import {
   PiggyBank, 
   Users, 
   ArrowRight,
-  ChevronRight
+  ChevronRight,
+  Lock,
+  Leaf,
+  Database
 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { MapView } from '../maps/MapView';
@@ -22,7 +25,7 @@ import { RouteTimeline, RouteStopItem } from '../components/ui/RouteTimeline';
 export const RideDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { carpools, currentUser, requestJoinCarpool, joinRequests } = useStore();
+  const { carpools, currentUser, currentCompany, joinRequests } = useStore();
 
   const carpool = carpools.find((c) => c.id === id) || carpools[0];
   const isHost = carpool.host_id === currentUser.id;
@@ -31,10 +34,13 @@ export const RideDetails: React.FC = () => {
     (r) => r.carpool_id === carpool.id && r.passenger_id === currentUser.id && r.status === 'pending'
   );
 
-  // Cost calculation
-  const yourShare = 64;
-  const soloCost = 174;
-  const savings = soloCost - yourShare; // ₹110
+  // Dynamic cost calculation based on company fuel & wear rate (companies table)
+  const totalTripCost = Math.round(carpool.distance_km * currentCompany.cost_per_km);
+  const totalRiders = Math.max(2, carpool.members.length + 1);
+  const yourShare = Math.max(35, Math.round(totalTripCost / totalRiders));
+  const soloCost = Math.round(carpool.distance_km * 22.0); // ₹22/km solo cab standard
+  const savings = Math.max(0, soloCost - yourShare);
+  const co2SavedKg = (carpool.distance_km * currentCompany.co2_kg_per_km).toFixed(2);
 
   // Format stops for RouteTimeline
   const stops: RouteStopItem[] = carpool.stops
@@ -119,7 +125,7 @@ export const RideDetails: React.FC = () => {
                     : 'Active'}
                 </Badge>
                 {carpool.visibility === 'women_only' && (
-                  <Badge variant="women-only">Women only</Badge>
+                  <Badge variant="women-only">Women only ♀</Badge>
                 )}
                 {carpool.visibility === 'private' && (
                   <Badge variant="private">Private</Badge>
@@ -129,7 +135,7 @@ export const RideDetails: React.FC = () => {
                 {carpool.origin_label.split(',')[0]} → {carpool.dest_label.split(',')[0]}
               </h1>
               <p className="text-xs text-[#5B6B80]">
-                {carpool.distance_km} km • ~{carpool.duration_min} min estimated duration
+                {carpool.distance_km} km • ~{carpool.duration_min} min • {currentCompany.name}
               </p>
             </div>
 
@@ -151,22 +157,33 @@ export const RideDetails: React.FC = () => {
               </div>
               <div>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-xs font-medium text-[#5B6B80]">Your share:</span>
+                  <span className="text-xs font-medium text-[#5B6B80]">Distance share:</span>
                   <span className="text-base font-bold text-[#0F1B2D]">₹{yourShare}</span>
                 </div>
                 <p className="text-xs font-bold text-[#22B07D]">
-                  Saves ₹{savings} vs solo ride
+                  Saves ₹{savings} vs solo cab (₹22/km)
                 </p>
               </div>
             </div>
 
             <div className="text-right text-[11px] text-[#5B6B80]">
-              <span className="block font-semibold">Fair Split</span>
-              <span>100% automated</span>
+              <span className="block font-bold text-[#2B8CEB]">₹{currentCompany.cost_per_km}/km rate</span>
+              <span className="text-[10px] text-[#22B07D] font-semibold flex items-center justify-end gap-1">
+                <Leaf className="w-3 h-3" />
+                <span>{co2SavedKg} kg CO₂ saved</span>
+              </span>
             </div>
           </div>
 
-          {/* Rider Avatars & Vehicle */}
+          {/* Address Privacy Assurance */}
+          <div className="p-3 bg-[#F5FAFF] border border-[#E3ECF5] rounded-2xl flex items-start gap-2.5 text-xs text-[#5B6B80]">
+            <Lock className="w-4 h-4 text-[#2B8CEB] shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
+              <strong className="text-[#0F1B2D]">Privacy Protected:</strong> Exact residential address is encrypted in PostgreSQL (<code className="font-mono text-[10px] text-[#2B8CEB]">address_enc BYTEA</code>). Pre-booking queries display a blurred 500m landmark (<code className="font-mono text-[10px] text-[#2B8CEB]">approx_point</code>).
+            </p>
+          </div>
+
+          {/* Driver & Passengers */}
           <div className="space-y-2">
             <span className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B80]">
               Driver & Passengers
@@ -195,7 +212,7 @@ export const RideDetails: React.FC = () => {
                   </div>
                 </div>
 
-                <span className="text-xs font-semibold text-[#22B07D]">Verified Host</span>
+                <span className="text-xs font-semibold text-[#22B07D]">Verified Host (4.95 ★)</span>
               </div>
 
               {/* Members */}
@@ -223,15 +240,25 @@ export const RideDetails: React.FC = () => {
 
           {/* Route Timeline (Vertical dotted line with numbered pickup stops) */}
           <div className="space-y-2">
-            <span className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B80]">
-              Route Timeline
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#5B6B80]">
+                Route Timeline (PostGIS LineString)
+              </span>
+              <button
+                type="button"
+                onClick={() => navigate('/database')}
+                className="text-[11px] text-[#2B8CEB] font-bold hover:underline flex items-center gap-1"
+              >
+                <Database className="w-3 h-3" />
+                <span>Inspect in SQL Console</span>
+              </button>
+            </div>
 
             <div className="p-3 bg-[#F5FAFF] border border-[#E3ECF5] rounded-2xl">
               <RouteTimeline
                 origin={{ name: carpool.origin_label, time: carpool.start_time }}
                 stops={stops}
-                destination={{ name: carpool.dest_label, time: '+32m' }}
+                destination={{ name: carpool.dest_label, time: '+22m' }}
               />
             </div>
           </div>

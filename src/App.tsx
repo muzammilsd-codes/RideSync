@@ -16,6 +16,7 @@ import { Alerts } from './pages/Alerts';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { Profile } from './pages/Profile';
 import { RideDetails } from './pages/RideDetails';
+import { DatabaseExplorer } from './pages/DatabaseExplorer';
 
 export const AppContent: React.FC = () => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -45,6 +46,7 @@ export const AppContent: React.FC = () => {
           <Route path="/requests" element={<Requests />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/database" element={<DatabaseExplorer />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

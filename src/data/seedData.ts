@@ -5,7 +5,11 @@ import {
   Commute, 
   JoinRequest, 
   AppNotification, 
-  SOSEvent 
+  SOSEvent,
+  Rating,
+  CompanyInfo,
+  AuditEntry,
+  DbLocation
 } from '../types';
 import { HYDERABAD_ROUTES } from './fallbackRoutes';
 
@@ -244,9 +248,22 @@ export const SEED_VEHICLES: Vehicle[] = [
     make: 'Maruti Suzuki',
     model: 'Grand Vitara Hybrid',
     type: 'SUV',
+    vehicle_category: 'car',
     fuel_type: 'Petrol',
     seats: 4,
     photo_url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'veh-rahul-bike',
+    owner_id: 'user-rahul',
+    reg_no: 'TS 09 FL 1290',
+    make: 'Ather',
+    model: '450X Gen 3',
+    type: 'Bike',
+    vehicle_category: 'bike',
+    fuel_type: 'EV',
+    seats: 1,
+    photo_url: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=400&auto=format&fit=crop&q=80',
   }
 ];
 
@@ -613,3 +630,131 @@ export const SEED_ADMIN_HISTORICAL = {
     { time: '07:30 PM', count: 29 },
   ]
 };
+
+export const SEED_COMPANIES: CompanyInfo[] = [
+  {
+    id: 'c0000000-0000-0000-0000-000000000001',
+    name: 'TechCorp India',
+    email_domain: 'techcorp.io',
+    cost_per_km: 8.00,
+    co2_kg_per_km: 0.120,
+  },
+  {
+    id: 'c0000000-0000-0000-0000-000000000002',
+    name: 'Microsoft IDC Hyderabad',
+    email_domain: 'microsoft.com',
+    cost_per_km: 8.50,
+    co2_kg_per_km: 0.125,
+  }
+];
+
+export const SEED_LOCATIONS: DbLocation[] = [
+  {
+    id: 'l0000000-0000-0000-0000-000000000001',
+    user_id: null,
+    company_id: 'c0000000-0000-0000-0000-000000000001',
+    label: 'Mindspace Tech Park Building 12',
+    point: { lat: 17.4435, lng: 78.3772 },
+    approx_point: { lat: 17.4435, lng: 78.3772 },
+  },
+  {
+    id: 'l0000000-0000-0000-0000-000000000002',
+    user_id: 'user-ananya',
+    company_id: 'c0000000-0000-0000-0000-000000000001',
+    label: 'Gachibowli Stadium Enclave',
+    point: { lat: 17.4401, lng: 78.3489 },
+    approx_point: { lat: 17.4420, lng: 78.3510 },
+  },
+  {
+    id: 'l0000000-0000-0000-0000-000000000003',
+    user_id: 'user-priya',
+    company_id: 'c0000000-0000-0000-0000-000000000001',
+    label: 'Kondapur Botanical Garden Crossing',
+    point: { lat: 17.4580, lng: 78.3600 },
+    approx_point: { lat: 17.4560, lng: 78.3620 },
+  },
+  {
+    id: 'l0000000-0000-0000-0000-000000000004',
+    user_id: 'user-rahul',
+    company_id: 'c0000000-0000-0000-0000-000000000001',
+    label: 'Madhapur Metro Circle',
+    point: { lat: 17.4483, lng: 78.3915 },
+    approx_point: { lat: 17.4470, lng: 78.3890 },
+  },
+  {
+    id: 'l0000000-0000-0000-0000-000000000005',
+    user_id: 'user-sneha',
+    company_id: 'c0000000-0000-0000-0000-000000000001',
+    label: 'Kondapur Main Road / RTO',
+    point: { lat: 17.4646, lng: 78.3619 },
+    approx_point: { lat: 17.4630, lng: 78.3630 },
+  },
+  {
+    id: 'l0000000-0000-0000-0000-000000000006',
+    user_id: 'user-vikram',
+    company_id: 'c0000000-0000-0000-0000-000000000001',
+    label: 'Miyapur Crossroads Metro',
+    point: { lat: 17.4930, lng: 78.3580 },
+    approx_point: { lat: 17.4910, lng: 78.3560 },
+  }
+];
+
+export const SEED_RATINGS: Rating[] = [
+  {
+    id: 'rating-1',
+    ride_id: 'carpool-ananya-01',
+    rater_id: 'user-kavya',
+    rater_name: 'Kavya Nair',
+    ratee_id: 'user-ananya',
+    ratee_name: 'Ananya Sharma',
+    score: 5,
+    comment: 'Super punctual, safe driving, and clean car. Felt very comfortable with the Women-Only pool!',
+    tags: ['Safe Driving', 'Punctual', 'Clean Car', 'Women-Only Verified'],
+    created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
+  },
+  {
+    id: 'rating-2',
+    ride_id: 'carpool-ananya-01',
+    rater_id: 'user-ananya',
+    rater_name: 'Ananya Sharma',
+    ratee_id: 'user-kavya',
+    ratee_name: 'Kavya Nair',
+    score: 5,
+    comment: 'Great co-rider! Was at pickup spot on time with OTP ready.',
+    tags: ['Punctual', 'Polite', 'OTP Ready'],
+    created_at: new Date(Date.now() - 3600000 * 23).toISOString(),
+  }
+];
+
+export const SEED_AUDIT_LOG: AuditEntry[] = [
+  {
+    id: 101,
+    actor_id: 'user-ananya',
+    actor_name: 'Ananya Sharma',
+    action: 'CREATE_RIDE',
+    entity: 'rides',
+    entity_id: 'carpool-ananya-01',
+    details: 'Hosted Women-Only commute from Gachibowli to Mindspace Tech Park',
+    created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
+  },
+  {
+    id: 102,
+    actor_id: 'user-priya',
+    actor_name: 'Priya Patel',
+    action: 'REQUEST_JOIN',
+    entity: 'ride_requests',
+    entity_id: 'req-demo-1',
+    details: 'Requested pickup at Kondapur Botanical Garden Crossing (91% match)',
+    created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+  },
+  {
+    id: 103,
+    actor_id: 'user-admin',
+    actor_name: 'Alok Kulkarni (Admin)',
+    action: 'TRIGGER_TEST',
+    entity: 'triggers',
+    entity_id: 'trg_women_only_req',
+    details: 'Verified database trigger enforce_women_only() rejects unauthorized male insertion',
+    created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
+  }
+];

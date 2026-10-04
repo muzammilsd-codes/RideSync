@@ -38,6 +38,8 @@ export const HostRide: React.FC = () => {
     vehicles[0]?.id || 'veh-ananya'
   );
   const [privacyMode, setPrivacyMode] = useState<'public' | 'private'>('public');
+  const [inviteCode, setInviteCode] = useState('DEV-TEAM-2026');
+  const [recurrenceEnabled, setRecurrenceEnabled] = useState(true);
   const [womenOnly, setWomenOnly] = useState(currentUser.gender === 'female');
   const [toastMessage, setToastMessage] = useState('');
   const [toastOpen, setToastOpen] = useState(false);
@@ -49,6 +51,16 @@ export const HostRide: React.FC = () => {
     const r = HYDERABAD_ROUTES[idx];
     setFromLocation(r.origin.label);
     setToLocation(r.dest.label);
+  };
+
+  const handleVehicleSelect = (vehId: string) => {
+    setSelectedVehicleId(vehId);
+    const veh = vehicles.find((v) => v.id === vehId);
+    if (veh?.vehicle_category === 'bike') {
+      setSeats(1);
+    } else if (seats < 2) {
+      setSeats(3);
+    }
   };
 
   const handlePostRide = (e?: React.FormEvent) => {
@@ -75,7 +87,8 @@ export const HostRide: React.FC = () => {
       commute_id: `commute-${Date.now()}`,
       vehicle_id: selectedVehicleId,
       visibility,
-      invite_code: privacyMode === 'private' ? 'TEAM-SYNC' : undefined,
+      invite_code: privacyMode === 'private' ? (inviteCode || 'TEAM-SYNC') : undefined,
+      recurrence_rule: recurrenceEnabled ? 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR' : undefined,
       seats_total: seats,
       seats_available: seats,
       start_time: departureTime,
@@ -241,17 +254,17 @@ export const HostRide: React.FC = () => {
             />
           </div>
 
-          {/* Vehicle Selector */}
+          {/* Vehicle Selector (Cars and Bikes) */}
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#5B6B80]">
-              Vehicle
+              Vehicle (Car / Bike)
             </label>
             <div className="grid grid-cols-2 gap-2">
               {vehicles.map((v) => (
                 <button
                   key={v.id}
                   type="button"
-                  onClick={() => setSelectedVehicleId(v.id)}
+                  onClick={() => handleVehicleSelect(v.id)}
                   className={`p-3 rounded-2xl border text-left transition-all ${
                     selectedVehicleId === v.id
                       ? 'bg-[#E8F3FF] border-[#2B8CEB] text-[#0F1B2D]'
@@ -259,9 +272,12 @@ export const HostRide: React.FC = () => {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#0F1B2D]">{v.model}</span>
+                    <span className="text-xs font-bold text-[#0F1B2D] truncate">
+                      {v.vehicle_category === 'bike' ? '🏍️ ' : '🚗 '}
+                      {v.model}
+                    </span>
                     {v.fuel_type === 'EV' && (
-                      <span className="text-[10px] bg-[#E8F3FF] text-[#2B8CEB] px-1.5 py-0.5 rounded font-bold">
+                      <span className="text-[10px] bg-[#E8F3FF] text-[#2B8CEB] px-1.5 py-0.5 rounded font-bold shrink-0">
                         EV
                       </span>
                     )}
@@ -285,6 +301,36 @@ export const HostRide: React.FC = () => {
               value={privacyMode}
               onChange={(v) => setPrivacyMode(v as 'public' | 'private')}
             />
+          </div>
+
+          {/* Private Ride Invite Code Input (CHECK constraint in schema) */}
+          {privacyMode === 'private' && (
+            <div className="p-3.5 bg-white border border-[#E3ECF5] rounded-2xl shadow-xs space-y-1">
+              <label className="block text-[10px] font-semibold uppercase tracking-wider text-[#5B6B80]">
+                Team Invite Code (Required for private rides)
+              </label>
+              <input
+                type="text"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                placeholder="e.g. DEV-TEAM-2026"
+                className="w-full bg-[#F5FAFF] border border-[#E3ECF5] px-3 py-2 rounded-xl text-xs font-mono font-bold text-[#2B8CEB] focus:outline-none"
+              />
+            </div>
+          )}
+
+          {/* Recurrence Rule Toggle */}
+          <div className="p-3.5 bg-white border border-[#E3ECF5] rounded-2xl shadow-xs">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-semibold text-[#0F1B2D] block">Weekly Mon–Fri Recurrence</span>
+                <span className="text-xs text-[#5B6B80]">Auto-schedule for standard office workdays</span>
+              </div>
+              <Toggle
+                checked={recurrenceEnabled}
+                onChange={(checked) => setRecurrenceEnabled(checked)}
+              />
+            </div>
           </div>
 
           {/* Toggle Row: "Women only" with purple badge preview */}

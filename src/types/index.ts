@@ -1,3 +1,5 @@
+export * from './db';
+
 export type Gender = 'male' | 'female' | 'other';
 export type UserRole = 'host' | 'passenger';
 export type RideVisibility = 'public' | 'private' | 'women_only';
@@ -23,6 +25,7 @@ export interface UserProfile {
   id: string;
   full_name: string;
   employee_id: string;
+  company_id?: string;
   email: string;
   mobile: string;
   gender: Gender; // Used strictly for women-only eligibility logic; never exposed in public rider cards
@@ -49,7 +52,8 @@ export interface Vehicle {
   reg_no: string;
   make: string;
   model: string;
-  type: 'Sedan' | 'Hatchback' | 'SUV' | 'EV';
+  type: 'Sedan' | 'Hatchback' | 'SUV' | 'EV' | 'Bike';
+  vehicle_category?: 'car' | 'bike';
   fuel_type: 'Petrol' | 'Diesel' | 'EV' | 'CNG';
   seats: number;
   photo_url?: string;
@@ -132,6 +136,7 @@ export interface Carpool {
   vehicle?: Vehicle;
   visibility: RideVisibility;
   invite_code?: string;
+  recurrence_rule?: string;
   seats_total: number;
   seats_available: number;
   status: CarpoolStatus;
@@ -249,4 +254,54 @@ export interface AppNotification {
   created_at: string;
   carpool_id?: string;
   action_url?: string;
+}
+
+export interface Rating {
+  id?: string;
+  ride_id: string;
+  rater_id: string;
+  rater_name: string;
+  ratee_id: string;
+  ratee_name: string;
+  score: number; // 1-5
+  comment?: string;
+  tags?: string[];
+  created_at: string;
+}
+
+export interface CompanyInfo {
+  id: string;
+  name: string;
+  email_domain: string;
+  cost_per_km: number; // ₹8.00
+  co2_kg_per_km: number; // 0.120 kg/km
+}
+
+export interface AuditEntry {
+  id: number;
+  actor_id?: string;
+  actor_name?: string;
+  action: string;
+  entity: string;
+  entity_id?: string;
+  details?: string;
+  created_at: string;
+}
+
+export interface AdminCreateRideParams {
+  hostId: string;
+  vehicleId?: string;
+  originLabel: string;
+  originLat: number;
+  originLng: number;
+  destLabel: string;
+  destLat: number;
+  destLng: number;
+  startTime: string;
+  seatsTotal: number;
+  visibility: RideVisibility;
+  inviteCode?: string;
+  recurrenceRule?: string;
+  dispatchCategory?: string;
+  preAssignedRiderIds?: string[];
 }
